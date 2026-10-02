@@ -2,7 +2,6 @@ using StaticSsrState.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Interactive Server is not registered. InteractiveProbe.razor is omitted on purpose.
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
