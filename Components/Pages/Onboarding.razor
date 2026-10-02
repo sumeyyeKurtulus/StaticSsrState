@@ -1,0 +1,124 @@
+@page "/onboarding"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Onboarding</PageTitle>
+
+@{
+    var step = Step is null || Step <= 1 ? 1 : Step.Value;
+}
+
+<section class="intro">
+    <p class="eyebrow">Session · three requests</p>
+    <h1>Onboarding</h1>
+    <p class="lede">Each step is a new page load. The draft stays in session until you finish.</p>
+</section>
+
+<ol class="steps" aria-label="Progress">
+    <li class="@(step == 1 ? "current" : step > 1 ? "done" : null)">Name</li>
+    <li class="@(step == 2 ? "current" : step > 2 ? "done" : null)">Company</li>
+    <li class="@(step == 3 ? "current" : null)">Review</li>
+</ol>
+
+<section class="panel">
+    @if (step <= 1)
+    {
+        <h2>Your name</h2>
+        <EditForm Model="NameInput" FormName="onboarding-name" OnValidSubmit="SaveName" Enhance="false">
+            <DataAnnotationsValidator />
+            <div class="field">
+                <label>
+                    Name
+                    <InputText @bind-Value="NameInput.Name" />
+                </label>
+                <ValidationMessage For="() => NameInput.Name" />
+            </div>
+            <button class="button" type="submit">Continue</button>
+        </EditForm>
+    }
+    else if (step == 2)
+    {
+        <h2>Your company</h2>
+        <p class="note">Name on file: <strong>@Name</strong></p>
+        <EditForm Model="CompanyInput" FormName="onboarding-company" OnValidSubmit="SaveCompany" Enhance="false">
+            <DataAnnotationsValidator />
+            <div class="field">
+                <label>
+                    Company
+                    <InputText @bind-Value="CompanyInput.Company" />
+                </label>
+                <ValidationMessage For="() => CompanyInput.Company" />
+            </div>
+            <button class="button" type="submit">Continue</button>
+        </EditForm>
+    }
+    else
+    {
+        <h2>Review</h2>
+        <p class="note"><strong>@Name</strong>, @Company</p>
+        <form method="post" @formname="onboarding-finish" @onsubmit="Finish">
+            <AntiforgeryToken />
+            <button class="button" type="submit">Finish and clear</button>
+        </form>
+    }
+</section>
+
+@code {
+    [SupplyParameterFromSession(Name = "onboarding_name")]
+    public string? Name { get; set; }
+
+    [SupplyParameterFromSession(Name = "onboarding_company")]
+    public string? Company { get; set; }
+
+    [SupplyParameterFromSession(Name = "onboarding_step")]
+    public int? Step { get; set; }
+
+    [SupplyParameterFromForm]
+    public NameInputModel NameInput { get; set; } = new();
+
+    [SupplyParameterFromForm]
+    public CompanyInputModel CompanyInput { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        // A GET supplies no form post, so [SupplyParameterFromForm] leaves these null.
+        NameInput ??= new();
+        CompanyInput ??= new();
+        NameInput.Name ??= Name;
+        CompanyInput.Company ??= Company;
+    }
+
+    private void SaveName()
+    {
+        Name = NameInput.Name;
+        Step = 2;
+        Navigation.NavigateTo("/onboarding", forceLoad: true);
+    }
+
+    private void SaveCompany()
+    {
+        Company = CompanyInput.Company;
+        Step = 3;
+        Navigation.NavigateTo("/onboarding", forceLoad: true);
+    }
+
+    private void Finish()
+    {
+        Name = null;
+        Company = null;
+        Step = null;
+        Navigation.NavigateTo("/onboarding", forceLoad: true);
+    }
+
+    public sealed class NameInputModel
+    {
+        [Required]
+        public string? Name { get; set; }
+    }
+
+    public sealed class CompanyInputModel
+    {
+        [Required]
+        public string? Company { get; set; }
+    }
+}

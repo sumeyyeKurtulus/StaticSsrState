@@ -1,0 +1,34 @@
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and test output
+*.log
+TestResults/
+[Bb]uild[Ll]og.*
+
+# Local secrets. Keep appsettings.json and appsettings.Development.json.
+secrets.json
+appsettings.*.local.json
+*.pubxml.user
+*.pfx
+*.snk
+.env
+.env.*

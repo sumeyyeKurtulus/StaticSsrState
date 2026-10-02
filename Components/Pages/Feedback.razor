@@ -1,0 +1,59 @@
+@page "/feedback"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Feedback</PageTitle>
+
+<section class="intro">
+    <p class="eyebrow">TempData · read once</p>
+    <h1>Feedback</h1>
+    <p class="lede">The comment is posted, then the browser loads this page again. The banner is the flash from that redirect.</p>
+</section>
+
+@if (!string.IsNullOrEmpty(_notice))
+{
+    <p class="banner" role="status">@_notice</p>
+}
+
+<section class="panel">
+    <EditForm Model="Input" FormName="feedback" OnValidSubmit="Submit" Enhance="false">
+        <DataAnnotationsValidator />
+        <div class="field">
+            <label>
+                Comment
+                <InputText @bind-Value="Input.Comment" />
+            </label>
+            <ValidationMessage For="() => Input.Comment" />
+        </div>
+        <button class="button" type="submit">Send</button>
+    </EditForm>
+</section>
+
+@code {
+    private string? _notice;
+
+    [SupplyParameterFromTempData(Name = "flash_message")]
+    public string? FlashMessage { get; set; }
+
+    [SupplyParameterFromForm]
+    public FeedbackInput Input { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        _notice = FlashMessage;
+        FlashMessage = null;
+    }
+
+    private void Submit()
+    {
+        FlashMessage = $"Thanks. We received \"{Input.Comment}\".";
+        Navigation.NavigateTo("/feedback", forceLoad: true);
+    }
+
+    public sealed class FeedbackInput
+    {
+        [Required]
+        [StringLength(280)]
+        public string? Comment { get; set; }
+    }
+}

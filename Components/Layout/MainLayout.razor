@@ -1,0 +1,16 @@
+﻿@inherits LayoutComponentBase
+
+<div class="shell">
+    <header class="topbar">
+        <a class="brand" href="/">Static SSR state</a>
+        <nav class="nav" aria-label="Demos">
+            <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
+            <NavLink href="feedback">Feedback</NavLink>
+            <NavLink href="onboarding">Onboarding</NavLink>
+        </nav>
+    </header>
+
+    <main class="page">
+        @Body
+    </main>
+</div>
